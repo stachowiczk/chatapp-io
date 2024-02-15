@@ -25,7 +25,7 @@ import { Server } from 'socket.io';
     },
   });
 
-  let connectedUsers: Record<string, string> = {};
+  const connectedUsers: Record<string, string> = {};
   io.on('connection', (socket) => {
     console.log('a user connected');
     connectedUsers[socket.id] = 'user';
@@ -48,7 +48,7 @@ import { Server } from 'socket.io';
   app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    connectedUsers[username] = hashedPassword;
+    // TODO: connectedUsers[username] = hashedPassword;
     res.status(201).send();
   });
 

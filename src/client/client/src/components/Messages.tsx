@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { set } from 'mongoose';
 
 const Messages = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Record<number, string>[]>([]);
   const [text, setText] = useState('');
   const [socketId, setSocketId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -24,6 +24,23 @@ const Messages = () => {
       newSocket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('message', (message: string) => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { id: prevMessages.length, text: message },
+        ]);
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off('message');
+      }
+    };
+  },
+    [socket]);
 
   const sendMessage = (text: string) => {
     if (socket) {
