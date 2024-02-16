@@ -41,3 +41,30 @@ li {
   text-decoration: none;
   list-style: none;
 }
+
+.messages {
+  display: flex;
+  flex-direction: column;
+}
+
+.message {
+  background-color: #4d39ff; /* Background color of the message bubble */
+  color: white;
+  border-radius: 10px 10px 10px 0px; /* Rounded corners */
+  padding: 10px; /* Padding inside the bubble */
+  margin-bottom: 10px; /* Spacing between messages */
+  max-width: 80%; /* Maximum width of the message bubble */
+  width: fit-content;
+}
+
+.message-left {
+  align-self: flex-start;
+  background-color: #e5e5ea;
+  border-radius: 10px 10px 0px 10px;
+} 
+
+.message-right {
+  align-self: flex-end;
+  background-color: #4d39ff;
+  border-radius: 10px 10px 0px 10px;
+}

@@ -11,29 +11,61 @@ import { Server } from 'socket.io';
 
   app.use(cors());
   app.use(express.json());
-  //app.use(
-  //session({
-  //secret: 'secret',
-  //resave: false,
-  //saveUninitialized: true,
-  //})
-  //);
+  app.use(
+    session({
+      secret: 'secret',
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
 
   const io = new Server(server, {
     cors: {
       origin: 'http://localhost:3000',
     },
   });
+  const user: Record<string, string> = {};
 
   const connectedUsers: Record<string, string> = {};
   io.on('connection', (socket) => {
     console.log('a user connected');
-    connectedUsers[socket.id] = 'user';
-    console.log('connectedUsers', connectedUsers);
+
+    socket.on('setUser', (username) => {
+      Object.keys(connectedUsers).find((key) => {
+        if (connectedUsers[key] === username) {
+          delete connectedUsers[key];
+        }
+      });
+      connectedUsers[socket.id] = username;
+      console.log('connectedUsers', connectedUsers);
+    });
+
     socket.on('message', (text) => {
-      console.log('message', {text});
+      console.log('message', { text });
       io.emit('message', text);
     });
+
+    socket.on('privateMessage', ({ text, to }) => {
+      const toSocketId = Object.keys(connectedUsers).find(
+        (socketId) => connectedUsers[socketId] === to
+      );
+      console.log('toSocketId', toSocketId);
+
+      if (socket && toSocketId) {
+        console.log('privateMessage', { text, to });
+        try {
+          socket.to(toSocketId).emit('privateMessage', { text });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
+  });
+
+  io.on('disconnect', (socket) => {
+    console.log('a user disconnected');
+    delete connectedUsers[socket.id];
+    console.log('connectedUsers', connectedUsers);
   });
 
   const testMessage = {
@@ -49,7 +81,8 @@ import { Server } from 'socket.io';
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     // TODO: connectedUsers[username] = hashedPassword;
-    res.status(201).send();
+    console.log('logged in', { username, password, hashedPassword });
+    res.status(200).json({ success: true, username });
   });
 
   app.post('/api/logout', (req, res) => {
