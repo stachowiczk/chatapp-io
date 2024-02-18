@@ -45,6 +45,7 @@ li {
 .messages {
   display: flex;
   flex-direction: column;
+  width: 50dvw;
 }
 
 .message {
@@ -58,13 +59,14 @@ li {
 }
 
 .message-left {
-  align-self: flex-start;
+  align-self: flex-end;
   background-color: #e5e5ea;
+  color: black;
   border-radius: 10px 10px 0px 10px;
 } 
 
 .message-right {
-  align-self: flex-end;
+  align-self: flex-start;
   background-color: #4d39ff;
   border-radius: 10px 10px 0px 10px;
 }
