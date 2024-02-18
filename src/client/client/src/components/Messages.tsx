@@ -20,8 +20,7 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
   const [users, setUsers] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [sentMessages, setSentMessages] = useState<Message[]>([]);
-  const [text, setText] = useState('');
+  const [text, setText] = useState<string>('');
   const [message, setMessage] = useState<Message>({ id: 0, text: '' });
   const [socketId, setSocketId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -50,10 +49,18 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
   useEffect(() => {
     if (socket) {
       socket.on('privateMessage', (message: Message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
+        if (!selectedUser) {
+        socket.emit('selectChat', usernameProp, message.from);}
+        else if (message.from === selectedUser) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        }
       });
       socket.on('connectedUsers', (connectedUsers: Record<string, string>) => {
         setUsers(Object.values(connectedUsers));
+      });
+      socket.emit('selectChat', usernameProp, selectedUser);
+      socket.on('selectChat', (messages: Message[]) => {
+        setMessages(messages);
       });
     }
     return () => {
@@ -61,17 +68,11 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
         socket.off('privateMessage');
       }
     };
-  }, [socket]);
+  }, [socket, selectedUser]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
   };
-
-  //const sendMessage = (message: Message) => {
-  //if (socket) {
-  //socket.emit('message', text);
-  //}
-  //};
 
   useEffect(() => {
     setMessage({
@@ -79,7 +80,6 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
       text: text,
       to: selectedUser,
       from: usernameProp,
-      date: new Date(),
     });
   }, [text, selectedUser]);
 
@@ -108,20 +108,15 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     <div>
       <h3>Chat with {selectedUser}</h3>
       <ul className="messages">
-        {messages
-          .slice() // create a copy of the array to avoid mutating the original
-          .sort((a, b) =>
-            a.date && b.date ? a.date.getTime() - b.date.getTime() : 0
-          ) // sort messages by date
-          .map((message: Message) => {
-            const isFromCurrentUser = message.from === usernameProp;
-            const messageClass = `message ${isFromCurrentUser ? 'message-left' : 'message-right'}`;
-            return (
-              <li key={message.id} className={messageClass}>
-                {message.text}
-              </li>
-            );
-          })}
+        {messages.map((message: Message) => {
+          const isFromCurrentUser = message.from === usernameProp;
+          const messageClass = `message ${isFromCurrentUser ? 'message-left' : 'message-right'}`;
+          return (
+            <li key={message.id} className={messageClass}>
+              {message.text}
+            </li>
+          );
+        })}
       </ul>
       {selectedUser ? (
         <form onSubmit={handleSubmit}>
@@ -138,6 +133,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
         users={users}
+        socket={socket}
       />
     </div>
   );

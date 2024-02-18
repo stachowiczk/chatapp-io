@@ -37,6 +37,11 @@
   }
 }
 
+body {
+  background-color: #282c34;
+  color: white;
+}
+
 li {
   text-decoration: none;
   list-style: none;
