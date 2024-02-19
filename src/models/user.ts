@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
-interface User {
+interface User extends mongoose.Document{
   username: string;
+  password: string;
   chats?: {
     [to: string]: {
       messages: {
@@ -15,6 +16,7 @@ interface User {
 
 const userSchema = new mongoose.Schema<User>({
   username: { type: String, required: true },
+  password: { type: String, required: true },
   chats: {
     type: Map,
     of: {
@@ -28,6 +30,7 @@ const userSchema = new mongoose.Schema<User>({
     },
   },
 });
+
 
 const User = mongoose.model<User>('User', userSchema);
 

@@ -10,6 +10,7 @@ import { set } from 'mongoose';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const loginStateHandler = (status: boolean, username: string) => {
     setUsername(username);
@@ -19,7 +20,10 @@ function App() {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/login');
+        const response = await axios.post('http://localhost:3001/api/login', {
+          username: username,
+          password: password,
+        });
         if (response.status === 200) {
           setIsLoggedIn(true);
         }

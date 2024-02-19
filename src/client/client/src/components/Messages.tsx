@@ -27,13 +27,18 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001');
+    const newSocket = io('http://localhost:3001', {
+      withCredentials: true,
+      auth: {
+        token: '123',
+        username: usernameProp,
+      },
+    });
 
     newSocket.on('connect', () => {
       console.log('connected to socketio');
       if (newSocket.id) {
         setSocketId(newSocket.id);
-        newSocket.emit('setUser', usernameProp);
       }
       setSocket(newSocket);
     });
