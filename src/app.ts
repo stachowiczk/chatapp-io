@@ -7,8 +7,6 @@ import { connectToDb } from './models';
 import { initPassport } from './passport';
 import { initSockets } from './sockets';
 
-import session from 'express-session';
-
 declare module 'express-session' {
   interface SessionData {
     username: string;
@@ -37,9 +35,13 @@ declare module 'express-session' {
 
   const sockets = initSockets(io, sessionMiddleware);
 
-  app.post('/api/login', passport.authenticate('jwt', {session: false}), (req, res) => {
-    res.status(200).send('Login successful');
-  });
+  app.post(
+    '/api/login',
+    passport.authenticate('local', { session: true }),
+    (req, res) => {
+      res.status(200).send('Logged in');
+    }
+  );
 
   server.listen(3001, () => {
     console.log('Server is listening on port 3001');

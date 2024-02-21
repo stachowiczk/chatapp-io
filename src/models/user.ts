@@ -1,39 +1,20 @@
 import mongoose from 'mongoose';
 
-interface User extends mongoose.Document{
+export interface UserInterface extends mongoose.Document {
   username: string;
   password: string;
-  chats?: {
-    [to: string]: {
-      messages: {
-        from: string;
-        text: string;
-        date: Date;
-      }[];
-    };
-  };
+  validatePassword: (password: string) => boolean;
 }
 
-const userSchema = new mongoose.Schema<User>({
-  username: { type: String, required: true },
+const userSchema = new mongoose.Schema<UserInterface>({
+  username: { type: String, unique: true, required: true },
   password: { type: String, required: true },
-  chats: {
-    type: Map,
-    of: {
-      messages: [
-        {
-          from: { type: String, required: true },
-          text: { type: String, required: false },
-          date: { type: Date, required: true },
-        },
-      ],
-    },
-  },
 });
 
+userSchema.methods.validatePassword = async function (password: string) {
+  return password === this.password;
+};
 
-const User = mongoose.model<User>('User', userSchema);
+const User = mongoose.model<UserInterface>('User', userSchema);
 
 export default User;
-
-

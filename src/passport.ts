@@ -1,48 +1,47 @@
 import express from 'express';
 import { Request, Express } from 'express';
-import session, { SessionData } from 'express-session';
 import 'express-session';
-import bcrypt from 'bcrypt';
-import User from './models/user';
+import User, { UserInterface } from './models/user';
 import passport from 'passport';
-import {
-  Strategy as JwtStrategy,
-  ExtractJwt,
-  VerifiedCallback,
-} from 'passport-jwt';
-
-interface JwtPayload {
-  _id: string;
-}
-
-const jwtSecret = 'secret';
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: jwtSecret,
-};
+import { Strategy as LocalStrategy, VerifyFunction } from 'passport-local';
 
 export const initPassport = (app: Express) => {
   app.use(passport.initialize());
   app.use(passport.session());
   passport.use(
-    new JwtStrategy(
-      jwtOptions,
-      async (jwtPayload: JwtPayload, done: VerifiedCallback) => {
-        try {
-          const user: User | null = await User.findOne({username: jwtPayload._id});
-          if (user) {
-            return done(null, user);
-          } else {
-            return done(null, false);
-          }
-        } catch (error) {
-          return done(error, false);
+    new LocalStrategy(async (username: string, password: string, done: any) => {
+      try {
+        const user: UserInterface | null = await User.findOne({ username });
+        if (!user) {
+          return done(null, false, { message: 'Incorrect username.' });
         }
+        if (!user.validatePassword(password)) {
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+      } catch (err) {
+        return done(err);
       }
-    )
+    })
   );
- return passport; 
+  passport.serializeUser((user: any, done) => {
+    done(null, user._id);
+  });
+
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user: UserInterface | null = await User.findById(id);
+      if (user) {
+        done(null, user);
+      } else {
+        done(null, false);
+      }
+    } catch (err) {
+      done(err);
+    }
+  });
+
+  return passport;
 };
 
 export default initPassport;
