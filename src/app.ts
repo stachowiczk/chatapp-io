@@ -6,6 +6,7 @@ import { initSession } from './session';
 import { connectToDb } from './models';
 import { initPassport } from './passport';
 import { initSockets } from './sockets';
+import jwt from 'jsonwebtoken';
 
 (async function main(): Promise<void> {
   const app = express();
@@ -30,16 +31,20 @@ import { initSockets } from './sockets';
 
   initSockets(io, sessionMiddleware);
 
-  app.post(
-    '/api/login',
-    passport.authenticate('local', {
-      failureRedirect: '/',
-    }),
-    async (req, res) => {
-        res.status(200).send('Logged in');
-    }
-  );
 
+  app.post('/api/login', (req, res, next) => {
+    console.log('login request');
+    passport.authenticate('local', {session: false}, async (err, user, info) => {
+      try {
+      const token = jwt.sign({ id: user._id }, 'secret', {
+        expiresIn: 60 * 60 * 24 * 7,
+      });
+      return res.status(200).json({ token: token });
+    } catch (error) {
+      console.error(error);
+    }
+    })(req, res, next);
+  });
   server.listen(3001, () => {
     console.log('Server is listening on port 3001');
   });

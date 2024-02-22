@@ -4,22 +4,9 @@ import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
 import { Session } from 'express-session';
 import User from './models/user';
-import passport from 'passport';
-declare module 'express-session' {
-  interface Session {
-    passport: {
-      user: string;
-    };
-  }
-}
+import jwt from 'jsonwebtoken';
+declare module 'express-session';
 
-declare module 'http' {
-  interface IncomingMessage {
-    session?: Session & Partial<Session>; // Add session
-    sessionID?: string; // Add sessionID
-    sessionStore?: any; // Add sessionStore
-  }
-}
 
 const connectedUsers: Record<string, string> = {};
 
@@ -27,20 +14,24 @@ export const initSockets = async (
   io: Server,
   sessionMiddleware: any
 ): Promise<void> => {
-  const wrap = (middleware: any) => (socket: Socket, next: any) =>
-    middleware(socket.request, {}, next);
-  io.use(wrap(sessionMiddleware));
 
   io.on('connection', async (socket: Socket) => {
     // add client to connected users, remove previous instance of user if exists
-    const username = socket.handshake.auth.username;
-    const session = socket.request.session;
-    const sessionstore = socket.request.sessionStore;
-    if (session) {
-      const passportSession = session?.passport;
-      console.log('passportSession', passportSession);
+    const token = socket.handshake.auth.token;
+    console.log('token', token);
+    jwt.verify(token, 'secret', async (err, decoded) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+    const decoded = jwt.decode(token);
+    console.log('decoded', decoded);
+    if (!decoded) {
+      return;
     }
-    console.log('session', session, 'id', session.id);
+    const usernameFromToken = await User.findOne({ _id: (decoded as any).id });
+    const username = usernameFromToken?.username;
 
     if (username) {
       Object.keys(connectedUsers).find((key) => {

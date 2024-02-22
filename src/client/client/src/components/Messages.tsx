@@ -32,9 +32,13 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
         redirect('/login');
       }
     }, 120);
+    const token = localStorage.getItem('token');
     const newSocket = io('http://localhost:3001', {
 
       withCredentials: true,
+      auth: {
+        token: token,
+      },
     });
 
     newSocket.on('connect', () => {
