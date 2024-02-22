@@ -1,16 +1,47 @@
-import { Server } from 'socket.io';
-import User from './models/user';
-import Message, { MessageObject } from './models/message';
-import { io } from 'socket.io-client';
+import { Server, Socket } from 'socket.io';
+import { Request } from 'express';
 import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
+import { Session } from 'express-session';
+import User from './models/user';
+import passport from 'passport';
+declare module 'express-session' {
+  interface Session {
+    passport: {
+      user: string;
+    };
+  }
+}
 
-export const initSockets = async (io: Server, session: any) => {
-  const connectedUsers: Record<string, string> = {};
-  io.on('connection', (socket) => {
+declare module 'http' {
+  interface IncomingMessage {
+    session?: Session & Partial<Session>; // Add session
+    sessionID?: string; // Add sessionID
+    sessionStore?: any; // Add sessionStore
+  }
+}
+
+const connectedUsers: Record<string, string> = {};
+
+export const initSockets = async (
+  io: Server,
+  sessionMiddleware: any
+): Promise<void> => {
+  const wrap = (middleware: any) => (socket: Socket, next: any) =>
+    middleware(socket.request, {}, next);
+  io.use(wrap(sessionMiddleware));
+
+  io.on('connection', async (socket: Socket) => {
     // add client to connected users, remove previous instance of user if exists
     const username = socket.handshake.auth.username;
-    console.log('username', username);
+    const session = socket.request.session;
+    const sessionstore = socket.request.sessionStore;
+    if (session) {
+      const passportSession = session?.passport;
+      console.log('passportSession', passportSession);
+    }
+    console.log('session', session, 'id', session.id);
+
     if (username) {
       Object.keys(connectedUsers).find((key) => {
         if (connectedUsers[key] === username) {
@@ -39,7 +70,7 @@ export const initSockets = async (io: Server, session: any) => {
       }
       const toSocketId = findSocketId(message.to, connectedUsers);
       const fromSocketId = findSocketId(message.from, connectedUsers);
-      console.log('toSocketId', toSocketId);
+      console.log('toSocketId', toSocketId, 'from ', fromSocketId);
 
       if (socket && toSocketId && fromSocketId) {
         try {

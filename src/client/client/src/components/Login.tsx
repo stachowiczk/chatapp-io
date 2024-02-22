@@ -16,11 +16,11 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn}) => {
       const response = await axios.post('http://localhost:3001/api/login',{ 
         username: username,
         password: password,
+        withCredentials: true,
       });
       if (response.status === 200) {
         setIsLoggedIn(true, username);
-      } else {
-      }
+      } 
     } catch (error) {
       console.error(error);
     }

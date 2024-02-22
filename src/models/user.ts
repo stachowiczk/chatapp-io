@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export interface UserInterface extends mongoose.Document {
   username: string;
   password: string;
-  validatePassword: (password: string) => boolean;
+  validatePassword: (password: string) => Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema<UserInterface>({
@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema<UserInterface>({
   password: { type: String, required: true },
 });
 
-userSchema.methods.validatePassword = async function (password: string) {
+userSchema.methods.validatePassword = function (password: string) {
   return password === this.password;
 };
 

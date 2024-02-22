@@ -2,16 +2,10 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { Server } from 'socket.io';
-import initSession from './session';
+import { initSession } from './session';
 import { connectToDb } from './models';
 import { initPassport } from './passport';
 import { initSockets } from './sockets';
-
-declare module 'express-session' {
-  interface SessionData {
-    username: string;
-  }
-}
 
 (async function main(): Promise<void> {
   const app = express();
@@ -24,22 +18,25 @@ declare module 'express-session' {
 
   app.use(cors(corsOptions));
   app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  await connectToDb();
   const sessionMiddleware = initSession(app);
   const passport = initPassport(app);
-
-  await connectToDb();
-
+  
   const io = new Server(server, {
     cors: corsOptions,
   });
 
-  const sockets = initSockets(io, sessionMiddleware);
+
+  initSockets(io, sessionMiddleware);
 
   app.post(
     '/api/login',
-    passport.authenticate('local', { session: true }),
-    (req, res) => {
-      res.status(200).send('Logged in');
+    passport.authenticate('local', {
+      failureRedirect: '/',
+    }),
+    async (req, res) => {
+        res.status(200).send('Logged in');
     }
   );
 

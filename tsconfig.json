@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src/**.ts"],
+  "exclude": ["node_modules"]
+}

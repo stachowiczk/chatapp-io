@@ -1,9 +1,7 @@
-import express from 'express';
-import { Request, Express } from 'express';
-import 'express-session';
+import {  Express } from 'express';
 import User, { UserInterface } from './models/user';
 import passport from 'passport';
-import { Strategy as LocalStrategy, VerifyFunction } from 'passport-local';
+import { Strategy as LocalStrategy } from 'passport-local';
 
 export const initPassport = (app: Express) => {
   app.use(passport.initialize());
@@ -11,14 +9,16 @@ export const initPassport = (app: Express) => {
   passport.use(
     new LocalStrategy(async (username: string, password: string, done: any) => {
       try {
-        const user: UserInterface | null = await User.findOne({ username });
+        const user: UserInterface | null = await User.findOne({ username }).exec();
         if (!user) {
           return done(null, false, { message: 'Incorrect username.' });
         }
-        if (!user.validatePassword(password)) {
+        const isValid = user.validatePassword(password);
+        if (!isValid) {
+          console.log('Incorrect password');
           return done(null, false, { message: 'Incorrect password.' });
         }
-        return done(null, user);
+        return done(null, user, { message: 'Logged In Successfully' });
       } catch (err) {
         return done(err);
       }
@@ -30,12 +30,8 @@ export const initPassport = (app: Express) => {
 
   passport.deserializeUser(async (id: string, done) => {
     try {
-      const user: UserInterface | null = await User.findById(id);
-      if (user) {
-        done(null, user);
-      } else {
-        done(null, false);
-      }
+      const user: UserInterface | null = await User.findOne({ _id: id }).exec();
+      return done(null, user);
     } catch (err) {
       done(err);
     }

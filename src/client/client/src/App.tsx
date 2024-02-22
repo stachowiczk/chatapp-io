@@ -21,8 +21,6 @@ function App() {
     const checkLogin = async () => {
       try {
         const response = await axios.post('http://localhost:3001/api/login', {
-          username: username,
-          password: password,
         });
         if (response.status === 200) {
           setIsLoggedIn(true);
@@ -31,8 +29,6 @@ function App() {
         console.error(error);
       }
     };
-    if (!isLoggedIn)
-    checkLogin();
   }, []);
 
     //<Router>

@@ -1,20 +1,27 @@
-import { Express } from "express";
-import session from "express-session";
-import fileStoreInitializer from "session-file-store";
+import session from 'express-session';
+import fileStoreInitializer from 'session-file-store';
+import path from 'path';
 
-export const initSession = (app: Express) => {
-    const FileStore = fileStoreInitializer(session);
+export const initSession = (app: any) => {
+  const FileStore = fileStoreInitializer(session);
 
-    const sessionMiddleware = session({
-        store: new FileStore(),
-        secret: "secret",
-        resave: false,
-        saveUninitialized: true,
-    });
-    app.use(sessionMiddleware);
-    return sessionMiddleware;
-}
+  const sessionMiddleware = session({
+    store: new FileStore({
+      path: path.join(__dirname, '../sessions'),
+    }),
+    secret: 'secret',
+    name: 'connect.sid', // name of the cookie
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      secure: false,
+      sameSite: 'none',
+    },
+  });
+  app.use(sessionMiddleware);
 
-export default initSession;
+  return sessionMiddleware;
+};
 
-
+export default { initSession };
