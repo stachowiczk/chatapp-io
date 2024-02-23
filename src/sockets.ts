@@ -48,9 +48,9 @@ export const initSockets = async (
       console.log('connectedUsers', connectedUsers);
     }
 
-    socket.on('selectChat', async (sender, recipient) => {
-      const messages = await getMessages(sender, recipient);
-      const socketId = findSocketId(sender, connectedUsers);
+    socket.on('selectChat', async (recipient) => {
+      const messages = await getMessages(username, recipient);
+      const socketId = findSocketId(username, connectedUsers);
       if (socketId && messages) {
         io.to(socketId).emit('selectChat', messages);
       }
@@ -58,12 +58,13 @@ export const initSockets = async (
 
     // send private message to specific client and sender
     socket.on('privateMessage', async (data) => {
+      data = { ...data, from: username };
       const message = await saveMessage(data);
       if (!message) {
         return;
       }
       const toSocketId = findSocketId(message.to, connectedUsers);
-      const fromSocketId = findSocketId(message.from, connectedUsers);
+      const fromSocketId = findSocketId(username, connectedUsers);
       console.log('toSocketId', toSocketId, 'from ', fromSocketId);
 
       if (socket && toSocketId && fromSocketId) {

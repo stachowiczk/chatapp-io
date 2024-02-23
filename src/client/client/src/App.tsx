@@ -8,7 +8,7 @@ import axios from 'axios';
 import { set } from 'mongoose';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean|null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [username, setUsername] = useState<string>('');
 
   const loginStateHandler = (status: boolean, username: string) => {
@@ -24,7 +24,7 @@ function App() {
         });
         if (response.status === 200) {
           setIsLoggedIn(true);
-          console.log('username', response.data.username);  
+          console.log('username', response.data.username);
           setUsername(response.data.username);
         }
       } catch (error) {
@@ -34,17 +34,19 @@ function App() {
     checkLogin();
   }, []);
 
-    //<Router>
-      //<Routes>
-        //<Route path="/messages" element={<Messages />} />
-        //<Route
-          //path="/login"
-          //element={<Login setIsLoggedIn={loginStateHandler} />}
-        ///>
-      //</Routes>
-    //</Router>
-  return (
-    isLoggedIn ? (<Messages usernameProp={username}/>) : (<Login setIsLoggedIn={loginStateHandler} />)
+  //<Router>
+  //<Routes>
+  //<Route path="/messages" element={<Messages />} />
+  //<Route
+  //path="/login"
+  //element={<Login setIsLoggedIn={loginStateHandler} />}
+  ///>
+  //</Routes>
+  //</Router>
+  return isLoggedIn ? (
+    <Messages usernameProp={username} setIsLoggedIn={setIsLoggedIn} />
+  ) : (
+    <Login setIsLoggedIn={loginStateHandler} />
   );
 }
 

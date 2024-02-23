@@ -82,7 +82,8 @@ import cookieParser from 'cookie-parser';
     )(req, res);
   });
 
-  app.get('/api/logout', (req, res) => {
+  app.post('/api/logout', (req, res) => {
+    res.clearCookie('token');
     res.status(200).json({ message: 'Logged out' });
   });
   server.listen(3001, () => {

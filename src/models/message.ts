@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface MessageObject {
-  from: string;
+  from?: string;
   to: string;
   text?: string;
   date: Date;

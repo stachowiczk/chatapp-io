@@ -2,6 +2,7 @@ import React, { FormEvent, useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { redirect } from 'react-router-dom';
 import Chats from './Chats';
+import LogoutButton from './LogoutButton';
 
 interface Message {
   id: number;
@@ -12,9 +13,10 @@ interface Message {
 }
 interface MessagesProps {
   usernameProp: string;
+  setIsLoggedIn: (value: boolean) => void;
 }
 
-const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
+const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
   const [users, setUsers] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>('');
@@ -22,14 +24,9 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
   const [socketId, setSocketId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const scrollRef = React.useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!usernameProp) {
-        redirect('/login');
-      }
-    }, 120);
-    const token = localStorage.getItem('token');
     const newSocket = io('http://localhost:3001', {
       withCredentials: true,
     });
@@ -55,15 +52,14 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     if (socket) {
       socket.on('privateMessage', (message: Message) => {
         if (!selectedUser) {
-          socket.emit('selectChat', usernameProp, message.from);
-        } else if (message.from === selectedUser) {
-          setMessages((prevMessages) => [...prevMessages, message]);
+          socket.emit('selectChat', message.from);
         }
+        setMessages((prevMessages) => [...prevMessages, message]);
       });
       socket.on('connectedUsers', (connectedUsers: Record<string, string>) => {
         setUsers(Object.values(connectedUsers));
       });
-      socket.emit('selectChat', usernameProp, selectedUser);
+      socket.emit('selectChat', selectedUser);
       socket.on('selectChat', (messages: Message[]) => {
         setMessages(messages);
       });
@@ -75,6 +71,12 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     };
   }, [socket, selectedUser]);
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
   };
@@ -84,7 +86,6 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
       id: messages.length + 1,
       text: text,
       to: selectedUser,
-      from: usernameProp,
     });
   }, [text, selectedUser]);
 
@@ -98,6 +99,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     console.log(message);
     if (socket) {
       socket.emit('privateMessage', message);
+      message.from = usernameProp;
       setMessages((prevMessages) => [...prevMessages, message]);
     }
   };
@@ -111,8 +113,9 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
 
   return (
     <div>
+      <LogoutButton setIsLoggedIn={setIsLoggedIn}/>
       <h3>Chat with {selectedUser}</h3>
-      <ul className="messages">
+      <ul ref={scrollRef} className="messages">
         {messages.map((message: Message) => {
           const isFromCurrentUser = message.from === usernameProp;
           const messageClass = `message ${isFromCurrentUser ? 'message-left' : 'message-right'}`;
