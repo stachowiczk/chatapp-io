@@ -49,6 +49,9 @@ li {
 
 .messages {
   display: flex;
+  height: 70dvh;
+  overflow: scroll;
+  scrollbar-width: none;
   flex-direction: column;
   width: 50dvw;
 }

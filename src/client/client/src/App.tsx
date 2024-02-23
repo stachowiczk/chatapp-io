@@ -8,9 +8,8 @@ import axios from 'axios';
 import { set } from 'mongoose';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean|null>(null);
+  const [username, setUsername] = useState<string>('');
 
   const loginStateHandler = (status: boolean, username: string) => {
     setUsername(username);
@@ -20,15 +19,19 @@ function App() {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const response = await axios.post('http://localhost:3001/api/login', {
+        const response = await axios.get('http://localhost:3001/api/login', {
+          withCredentials: true,
         });
         if (response.status === 200) {
           setIsLoggedIn(true);
+          console.log('username', response.data.username);  
+          setUsername(response.data.username);
         }
       } catch (error) {
         console.error(error);
       }
     };
+    checkLogin();
   }, []);
 
     //<Router>

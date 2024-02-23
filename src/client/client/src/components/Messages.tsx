@@ -31,11 +31,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     }, 120);
     const token = localStorage.getItem('token');
     const newSocket = io('http://localhost:3001', {
-
       withCredentials: true,
-      auth: {
-        token: token,
-      },
     });
 
     newSocket.on('connect', () => {
@@ -59,8 +55,8 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp }) => {
     if (socket) {
       socket.on('privateMessage', (message: Message) => {
         if (!selectedUser) {
-        socket.emit('selectChat', usernameProp, message.from);}
-        else if (message.from === selectedUser) {
+          socket.emit('selectChat', usernameProp, message.from);
+        } else if (message.from === selectedUser) {
           setMessages((prevMessages) => [...prevMessages, message]);
         }
       });

@@ -3,6 +3,7 @@ import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
 declare module 'express-session';
 
 
@@ -10,21 +11,25 @@ const connectedUsers: Record<string, string> = {};
 
 export const initSockets = async (
   io: Server,
-  sessionMiddleware: any
 ): Promise<void> => {
 
   io.on('connection', async (socket: Socket) => {
     // add client to connected users, remove previous instance of user if exists
-    const token = socket.handshake.auth.token;
+    const cookie = socket.request.headers.cookie;
+    const token = cookie?.split('token=')[1];
+
+
     console.log('token', token);
+    if (!token) {
+      return;
+    }
     jwt.verify(token, 'secret', async (err, decoded) => {
       if (err) {
         console.error(err);
-        return;
+        return socket.disconnect();
       }
     });
     const decoded = jwt.decode(token);
-    console.log('decoded', decoded);
     if (!decoded) {
       return;
     }
