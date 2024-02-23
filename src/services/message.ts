@@ -1,5 +1,5 @@
-import Message, { MessageObject } from '../models/message';
-export const saveMessage = async (data: MessageObject) => {
+import Message, { MessageInterface } from '../models/message';
+export const saveMessage = async (data: MessageInterface) => {
   try {
     const { from, to, text } = data;
     const message = new Message({

@@ -22,7 +22,7 @@ import cookieParser from 'cookie-parser';
   app.use(cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser())
+  app.use(cookieParser());
   await connectToDb();
   //const sessionMiddleware = initSession(app);
   const passport = initPassport(app);
@@ -33,6 +33,7 @@ import cookieParser from 'cookie-parser';
 
   initSockets(io);
 
+  //TODO: move to a middleware
   app.get('/api/login', async (req, res, next) => {
     try {
       const token = req.cookies['token'];
@@ -73,7 +74,7 @@ import cookieParser from 'cookie-parser';
             secure: false,
             maxAge: 1000 * 60 * 60 * 24 * 7,
           });
-          return res.status(200).json({ok: 'ok'});
+          return res.status(200).json({ ok: 'ok' });
         } catch (error) {
           console.error(error);
           return res.status(500).json({ message: 'Internal server error' });
@@ -83,8 +84,12 @@ import cookieParser from 'cookie-parser';
   });
 
   app.post('/api/logout', (req, res) => {
-    res.clearCookie('token');
-    res.status(200).json({ message: 'Logged out' });
+    try {
+      res.clearCookie('token');
+      res.status(200).json({ message: 'Logged out' });
+    } catch (error) {
+      return res.status(400).json({ message: 'already logged out' });
+    }
   });
   server.listen(3001, () => {
     console.log('Server is listening on port 3001');

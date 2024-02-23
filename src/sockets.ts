@@ -3,7 +3,6 @@ import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
 declare module 'express-session';
 
 
@@ -56,7 +55,6 @@ export const initSockets = async (
       }
     });
 
-    // send private message to specific client and sender
     socket.on('privateMessage', async (data) => {
       data = { ...data, from: username };
       const message = await saveMessage(data);
