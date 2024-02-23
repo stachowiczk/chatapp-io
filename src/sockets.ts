@@ -3,20 +3,14 @@ import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
-declare module 'express-session';
-
 
 const connectedUsers: Record<string, string> = {};
 
-export const initSockets = async (
-  io: Server,
-): Promise<void> => {
-
+export const initSockets = async (io: Server): Promise<void> => {
   io.on('connection', async (socket: Socket) => {
     // add client to connected users, remove previous instance of user if exists
     const cookie = socket.request.headers.cookie;
     const token = cookie?.split('token=')[1];
-
 
     console.log('token', token);
     if (!token) {

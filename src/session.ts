@@ -1,3 +1,5 @@
+// deprecated: now using jwt
+
 import session from 'express-session';
 import fileStoreInitializer from 'session-file-store';
 import path from 'path';
