@@ -1,9 +1,6 @@
 import React, { FormEvent, useState, useEffect } from 'react';
-import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
-import { set } from 'mongoose';
 import { redirect } from 'react-router-dom';
-import { send } from 'process';
 import Chats from './Chats';
 
 interface Message {

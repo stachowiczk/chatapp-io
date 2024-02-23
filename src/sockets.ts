@@ -1,8 +1,6 @@
 import { Server, Socket } from 'socket.io';
-import { Request } from 'express';
 import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
-import { Session } from 'express-session';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
 declare module 'express-session';
