@@ -12,7 +12,6 @@ export const initSockets = async (io: Server): Promise<void> => {
     const cookie = socket.request.headers.cookie;
     const token = cookie?.split('token=')[1];
 
-    console.log('token', token);
     if (!token) {
       return;
     }
@@ -68,11 +67,12 @@ export const initSockets = async (io: Server): Promise<void> => {
         }
       }
     });
+    socket.on('disconnect', () => {
+      console.log('a user disconnected');
+      delete connectedUsers[socket.id];
+      io.emit('connectedUsers', connectedUsers);
+      console.log('connectedUsers', connectedUsers);
+    });
   });
 
-  io.on('disconnect', (socket) => {
-    console.log('a user disconnected');
-    delete connectedUsers[socket.id];
-    console.log('connectedUsers', connectedUsers);
-  });
 };

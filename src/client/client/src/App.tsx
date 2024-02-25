@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/login', {
+        const response = await axios.get('http://localhost:4000/api/auth/login', {
           withCredentials: true,
         });
         if (response.status === 200) {

@@ -27,7 +27,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
   const scrollRef = React.useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001', {
+    const newSocket = io('http://localhost:4000', {
       withCredentials: true,
     });
 

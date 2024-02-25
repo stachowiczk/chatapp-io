@@ -6,7 +6,8 @@ import { connectToDb } from './models';
 import { initPassport } from './passport';
 import { initSockets } from './sockets';
 import cookieParser from 'cookie-parser';
-import router from './api/loginRoutes';
+import loginRouter from './api/loginRoutes';
+import usersRouter from './api/usersRoutes';
 import { CORS_OPTIONS, SERVER_PORT} from './constants/constants';
 
 (async function main(): Promise<void> {
@@ -27,7 +28,8 @@ import { CORS_OPTIONS, SERVER_PORT} from './constants/constants';
 
   initSockets(io);
 
-  app.use('/', router);
+  app.use('/api/auth', loginRouter);
+  app.use('/api/users', usersRouter);
 
   server.listen(SERVER_PORT, () => {
     console.log('Server running on port', SERVER_PORT);

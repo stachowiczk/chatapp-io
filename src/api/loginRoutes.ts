@@ -2,11 +2,12 @@ import { Router } from 'express';
 import User from '../models/user';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import { authenticate } from '../constants/helpers';
 
-const router = Router();
+const loginRouter = Router();
 
 // This verifies if the user is logged in
-router.get('/api/login', async (req, res, next) => {
+loginRouter.get('/login', async (req, res, next) => {
   try {
     const token = req.cookies['token'];
     if (!token) {
@@ -32,7 +33,7 @@ router.get('/api/login', async (req, res, next) => {
   }
 });
 // Login route
-router.post('/api/login', async (req, res) => {
+loginRouter.post('/login', async (req, res) => {
   passport.authenticate(
     'local',
     { session: false },
@@ -55,13 +56,12 @@ router.post('/api/login', async (req, res) => {
   )(req, res);
 });
 
-router.post('/api/logout', (req, res) => {
+loginRouter.post('/logout', (req, res) => {
   try {
-    res.clearCookie('token');
-    res.status(200).json({ message: 'Logged out' });
+    return res.status(200).clearCookie('token').send();
   } catch (error) {
     return res.status(400).json({ message: 'already logged out' });
   }
 });
 
-export default router;
+export default loginRouter;

@@ -78,3 +78,8 @@ li {
   background-color: #4d39ff;
   border-radius: 10px 10px 0px 10px;
 }
+
+.online-dot {
+  color: green;
+  font-size: 1.3em;
+}

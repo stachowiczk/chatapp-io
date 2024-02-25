@@ -18,6 +18,10 @@ userSchema.methods.validatePassword = function (password: string) {
   return password === this.password;
 };
 
+userSchema.methods.getFriends = function () {
+  return this.friends;
+}
+
 const User = mongoose.model<UserInterface>('User', userSchema);
 
 export default User;

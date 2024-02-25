@@ -14,7 +14,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn}) => {
     event.preventDefault();
     
     try {
-      const response = await axios.post('http://localhost:3001/api/login',{ 
+      const response = await axios.post('http://localhost:4000/api/auth/login',{ 
         username: username,
         password: password,
       }, {

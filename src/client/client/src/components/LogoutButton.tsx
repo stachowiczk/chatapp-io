@@ -4,7 +4,7 @@ import axios from 'axios';
 const LogoutButton = (props: { setIsLoggedIn: (arg0: boolean) => void; }) => {
   const handleLogout = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/api/logout', {
+      const response = await axios.post('http://localhost:4000/api/auth/logout', {
         withCredentials: true,
       });
       if (response.status === 200) {
