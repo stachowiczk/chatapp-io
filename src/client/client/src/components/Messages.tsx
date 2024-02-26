@@ -1,11 +1,10 @@
 import React, { FormEvent, useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { redirect } from 'react-router-dom';
 import Chats from './Chats';
 import LogoutButton from './LogoutButton';
 
 interface Message {
-  id: number;
+  id: string;
   to?: string | null;
   text?: string;
   from?: string | null;
@@ -20,7 +19,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
   const [users, setUsers] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>('');
-  const [message, setMessage] = useState<Message>({ id: 0, text: '' });
+  const [message, setMessage] = useState<Message>({ id: '', text: '' });
   const [socketId, setSocketId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -83,7 +82,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
 
   useEffect(() => {
     setMessage({
-      id: messages.length + 1,
+      id: socketId ? (socketId + messages.length) : '0',
       text: text,
       to: selectedUser,
     });
@@ -92,7 +91,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
   const sendPrivateMessage = (message: Message) => {
     console.log('sendPrivateMessage', message);
     setMessage({
-      id: messages.length + 1,
+      id: socketId ? (socketId + messages.length) : '0',
       text: text,
     });
 

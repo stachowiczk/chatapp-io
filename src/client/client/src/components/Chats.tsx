@@ -64,7 +64,6 @@ const Chats = (props: any) => {
     setAddFriend('');
   };
 
-
   return (
     <div>
       <ul>
@@ -77,19 +76,22 @@ const Chats = (props: any) => {
       <ul>
         {friends.map((friend: string) => (
           <li key={friend} onClick={() => handleClickedUser(friend)}>
-            {friend} {props.users.includes(friend) ? <span className='online-dot'>&#x2022;</span>: 'offline'}
+            {friend}{' '}
+            {props.users.includes(friend) ? (
+              <span className="online-dot">&#x2022;</span>
+            ) : (
+              'offline'
+            )}
           </li>
         ))}
       </ul>
-      <form>
+      <form onSubmit={handleAddFriend}>
         <input
           type="text"
           placeholder="add friend"
           onChange={(event) => setAddFriend(event.target.value)}
         />
-        <button type="button" onClick={handleAddFriend}>
-          Add
-        </button>
+        <button type="submit">Add</button>
       </form>
     </div>
   );

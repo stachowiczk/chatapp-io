@@ -3,6 +3,7 @@ import { findSocketId } from './constants/helpers';
 import { saveMessage, getMessages } from './services/message';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
+import errorResponse from './constants/errorResponse';
 
 const connectedUsers: Record<string, string> = {};
 
@@ -41,11 +42,13 @@ export const initSockets = async (io: Server): Promise<void> => {
     }
 
     socket.on('selectChat', async (recipient) => {
+      try {
       const messages = await getMessages(username, recipient);
       const socketId = findSocketId(username, connectedUsers);
       if (socketId && messages) {
         io.to(socketId).emit('selectChat', messages);
-      }
+      } } catch (error) {
+        errorResponse(error, socket);}
     });
 
     socket.on('privateMessage', async (data) => {

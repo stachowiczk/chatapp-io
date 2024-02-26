@@ -3,7 +3,12 @@ import logo from './logo.svg';
 import './App.css';
 import Messages from './components/Messages';
 import Login from './components/Login';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from 'react-router-dom';
 import axios from 'axios';
 import { set } from 'mongoose';
 
@@ -11,15 +16,10 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [username, setUsername] = useState<string>('');
 
-  const loginStateHandler = (status: boolean, username: string) => {
-    setUsername(username);
-    setIsLoggedIn(status);
-  };
-
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/auth/login', {
+        const response = await axios.get('http://localhost:4000/api/auth/', {
           withCredentials: true,
         });
         if (response.status === 200) {
@@ -34,19 +34,35 @@ function App() {
     checkLogin();
   }, []);
 
-  //<Router>
-  //<Routes>
-  //<Route path="/messages" element={<Messages />} />
-  //<Route
-  //path="/login"
-  //element={<Login setIsLoggedIn={loginStateHandler} />}
-  ///>
-  //</Routes>
-  //</Router>
-  return isLoggedIn ? (
-    <Messages usernameProp={username} setIsLoggedIn={setIsLoggedIn} />
-  ) : (
-    <Login setIsLoggedIn={loginStateHandler} />
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={<Navigate to={isLoggedIn ? '/messages' : '/login'} />}
+        />
+        <Route
+          path="/login"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/messages" />
+            ) : (
+              <Login setIsLoggedIn={setIsLoggedIn} />
+            )
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            isLoggedIn ? (
+              <Messages usernameProp={username} setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,3 +1,4 @@
+import { NOT_FOUND, VALIDATION_ERROR } from '../constants/constants';
 import Message, { MessageInterface } from '../models/message';
 export const saveMessage = async (data: MessageInterface) => {
   try {
@@ -13,7 +14,7 @@ export const saveMessage = async (data: MessageInterface) => {
 
     return message;
   } catch (error) {
-    console.error(error);
+    throw new Error(VALIDATION_ERROR);
   }
 };
 
@@ -24,11 +25,12 @@ export const getMessages = async (sender: string, recipient: string) => {
         { to: sender, from: recipient },
         { to: recipient, from: sender },
       ],
-    });
-    messages.sort((a, b) => a.date.getTime() - b.date.getTime());
+    })
+      .sort({ date: 1 })
+      .limit(100);
 
     return messages;
   } catch (error) {
-    console.error(error);
+    throw new Error(NOT_FOUND);
   }
 };

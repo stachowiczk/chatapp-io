@@ -8,7 +8,7 @@ import { initSockets } from './sockets';
 import cookieParser from 'cookie-parser';
 import loginRouter from './api/loginRoutes';
 import usersRouter from './api/usersRoutes';
-import { CORS_OPTIONS, SERVER_PORT} from './constants/constants';
+import { CORS_OPTIONS, SERVER_PORT } from './constants/constants';
 
 (async function main(): Promise<void> {
   const app = express();
@@ -30,6 +30,10 @@ import { CORS_OPTIONS, SERVER_PORT} from './constants/constants';
 
   app.use('/api/auth', loginRouter);
   app.use('/api/users', usersRouter);
+
+  app.use((req, res) => {
+    res.status(404).json({ message: 'Not found' });
+  });
 
   server.listen(SERVER_PORT, () => {
     console.log('Server running on port', SERVER_PORT);

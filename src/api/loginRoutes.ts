@@ -7,7 +7,7 @@ import { authenticate } from '../constants/helpers';
 const loginRouter = Router();
 
 // This verifies if the user is logged in
-loginRouter.get('/login', async (req, res, next) => {
+loginRouter.get('/', async (req, res, next) => {
   try {
     const token = req.cookies['token'];
     if (!token) {
@@ -56,9 +56,9 @@ loginRouter.post('/login', async (req, res) => {
   )(req, res);
 });
 
-loginRouter.post('/logout', (req, res) => {
+loginRouter.get('/logout', (req, res) => {
   try {
-    return res.status(200).clearCookie('token').send();
+    return res.clearCookie('token').status(200).json({ message: 'logged out' });
   } catch (error) {
     return res.status(400).json({ message: 'already logged out' });
   }

@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import User, { UserInterface } from '../models/user';
 import { authenticate } from '../constants/helpers';
-import f from 'session-file-store';
+import errorResponse from '../constants/errorResponse';
+import { addFriend } from '../services/user';
+import { UNAUTHORIZED } from '../constants/constants';
 
 const usersRouter = Router();
 
@@ -9,28 +11,13 @@ usersRouter.post('/add', authenticate, async (req, res) => {
   try {
     const user = req.user;
     if (!user) {
-      return res.status(403).json({ message: 'User not authenticated' });
+      throw new Error(UNAUTHORIZED);
     }
     const userToAdd = req.body.username;
-    const userId = await User.findOne({ username: userToAdd }).select('_id');
-    if ((user as UserInterface)._id === userId?._id) {
-      return res.status(409).json({ message: 'Cannot add yourself' });
-    }
-    const entryAlreadyExists = await User.findOne({
-      _id: (user as UserInterface)._id,
-      friends: userId,
-    });
-    if (entryAlreadyExists) {
-      return res.status(409).json({ message: 'Friend already added' });
-    }
-    await User.updateOne(
-      { _id: (user as UserInterface)._id },
-      { $addToSet: { friends: userId } }
-    );
+    await addFriend(user as UserInterface, userToAdd);
     return res.status(200).json({ message: 'Friend added' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    return errorResponse(err, res);
   }
 });
 
@@ -38,7 +25,7 @@ usersRouter.get('/friends', authenticate, async (req, res) => {
   try {
     const user = req.user;
     if (!user) {
-      return res.status(403).json({ message: 'User not authenticated' });
+        throw new Error(UNAUTHORIZED);
     }
     // get user document from db
     const userDocument = await User.findOne({

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export interface MessageInterface {
+export interface MessageInterface extends mongoose.Document{
   from?: string;
   to: string;
   text?: string;
