@@ -1,16 +1,19 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import axios from 'axios';
-import { Navigate } from 'react-router';
+import { Navigate, useNavigate} from 'react-router';
+import { AuthContext } from '../context/AuthContext';
 
-const LogoutButton = (props: { setIsLoggedIn: (arg0: boolean) => void; }) => {
+const LogoutButton = () => {
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useContext(AuthContext);
   const handleLogout = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/auth/logout', {
         withCredentials: true,
       });
       if (response.status === 200) {
-        props.setIsLoggedIn(false);
-        return <Navigate to="/login" />;
+        setIsLoggedIn(false);
+        return navigate('/');
       }
     } catch (error) {
       console.error(error);

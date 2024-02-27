@@ -4,6 +4,8 @@ import { saveMessage, getMessages } from './services/message';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
 import errorResponse from './constants/errorResponse';
+import socketError from './constants/socketError';
+import { MISSING_DATA, NOT_FOUND } from './constants/constants';
 
 const connectedUsers: Record<string, string> = {};
 
@@ -43,31 +45,38 @@ export const initSockets = async (io: Server): Promise<void> => {
 
     socket.on('selectChat', async (recipient) => {
       try {
-      const messages = await getMessages(username, recipient);
-      const socketId = findSocketId(username, connectedUsers);
-      if (socketId && messages) {
-        io.to(socketId).emit('selectChat', messages);
-      } } catch (error) {
-        errorResponse(error, socket);}
+        const messages = await getMessages(username, recipient);
+        const socketId = findSocketId(username, connectedUsers);
+        if (socketId && messages) {
+          io.to(socketId).emit('selectChat', messages);
+        }
+      } catch (error) {
+        socketError(error, socket);
+      }
     });
 
     socket.on('privateMessage', async (data) => {
-      data = { ...data, from: username };
-      const message = await saveMessage(data);
-      if (!message) {
-        return;
-      }
-      const toSocketId = findSocketId(message.to, connectedUsers);
-      const fromSocketId = findSocketId(username, connectedUsers);
-      console.log('toSocketId', toSocketId, 'from ', fromSocketId);
+      try {
+        data = { ...data, from: username };
+        const message = await saveMessage(data);
+        if (!message) {
+          throw new Error(MISSING_DATA);
+        }
+        const toSocketId = findSocketId(message.to, connectedUsers);
+        if (!toSocketId) {
+          throw new Error(NOT_FOUND);
+        }
+        const fromSocketId = findSocketId(username, connectedUsers);
+        console.log('toSocketId', toSocketId, 'from ', fromSocketId);
 
-      if (socket && toSocketId && fromSocketId) {
-        try {
+        if (socket && toSocketId && fromSocketId) {
           socket.to(toSocketId).emit('privateMessage', message);
           socket.to(fromSocketId).emit('privateMessage', message);
-        } catch (error) {
-          console.error(error);
+        } else {
+          throw new Error(NOT_FOUND);
         }
+      } catch (error) {
+        socketError(error, socket);
       }
     });
     socket.on('disconnect', () => {
@@ -77,5 +86,4 @@ export const initSockets = async (io: Server): Promise<void> => {
       console.log('connectedUsers', connectedUsers);
     });
   });
-
 };

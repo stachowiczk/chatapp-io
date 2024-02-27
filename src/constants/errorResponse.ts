@@ -1,6 +1,8 @@
-import { CONFLICT, NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED } from './constants';
+import { CONFLICT, NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED, MISSING_DATA } from './constants';
 export default (err, res) => {
     switch (err.message) {
+        case MISSING_DATA:
+            return res.status(400).json({ message: 'Missing data' });
         case CONFLICT:
             return res.status(409).json({ message: 'Conflict' });
         case NOT_FOUND:

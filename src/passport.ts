@@ -12,14 +12,14 @@ export const initPassport = (app: Express) => {
       try {
         const user: UserInterface | null = await User.findOne({ username }).exec();
         if (!user) {
-          return done(null, false, { message: 'Incorrect username.' });
+          return done(null, false, { message: 'Invalid credentials' });
         }
-        const isValid = user.validatePassword(password);
+        const isValid = await user.validatePassword(password);
         if (!isValid) {
           console.log('Incorrect password');
-          return done(null, false, { message: 'Incorrect password.' });
+          return done(null, false, { message: 'Invalid credentials' });
         }
-        return done(null, user, { message: 'Logged In Successfully' });
+        return done(null, user, { message: 'ok' });
       } catch (err) {
         return done(err);
       }

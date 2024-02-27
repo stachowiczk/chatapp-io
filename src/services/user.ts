@@ -1,4 +1,5 @@
 import User, { UserInterface } from '../models/user';
+
 import {
   CONFLICT,
   VALIDATION_ERROR,
@@ -28,6 +29,34 @@ export const addFriend = async (source: UserInterface, targetUser: string) => {
       { $addToSet: { friends: targetId } }
     );
   } catch (err) {
+    throw new Error(VALIDATION_ERROR);
+  }
+};
+
+export const getFriends = async (user: UserInterface) => {
+    const userDocument = await User.findOne({
+        _id: user._id,
+        });
+    if (!userDocument) {
+        throw new Error(NOT_FOUND);
+    }
+    const friends = userDocument?.friends;
+    const friendsList = await User.find({
+        _id: { $in: friends },
+        }).select('username');
+
+    return friendsList.map((friend) => friend.username);
+}
+
+export const addUser = async (username: string, password: string) => {
+  try {
+    const user = new User({
+      username,
+      password,
+    });
+    user.password = await user.hashPassword(password);
+    await user.save();
+  } catch (error) {
     throw new Error(VALIDATION_ERROR);
   }
 };

@@ -1,7 +1,8 @@
-import React, { FormEvent, useState, useEffect } from 'react';
+import React, { FormEvent, useState, useEffect, useContext} from 'react';
 import { io, Socket } from 'socket.io-client';
 import Chats from './Chats';
 import LogoutButton from './LogoutButton';
+import { AuthContext } from '../context/AuthContext';
 
 interface Message {
   id: string;
@@ -10,19 +11,16 @@ interface Message {
   from?: string | null;
   date?: Date;
 }
-interface MessagesProps {
-  usernameProp: string;
-  setIsLoggedIn: (value: boolean) => void;
-}
 
-const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
+const Messages = () => {
+  const { username } = useContext(AuthContext);
   const [users, setUsers] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>('');
   const [message, setMessage] = useState<Message>({ id: '', text: '' });
   const [socketId, setSocketId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null | undefined>(localStorage.getItem('selectedUser') || null);
   const scrollRef = React.useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
@@ -52,6 +50,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
       socket.on('privateMessage', (message: Message) => {
         if (!selectedUser) {
           socket.emit('selectChat', message.from);
+          setSelectedUser(message.from);
         }
         setMessages((prevMessages) => [...prevMessages, message]);
       });
@@ -98,7 +97,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
     console.log(message);
     if (socket) {
       socket.emit('privateMessage', message);
-      message.from = usernameProp;
+      message.from = username;
       setMessages((prevMessages) => [...prevMessages, message]);
     }
   };
@@ -112,11 +111,11 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
 
   return (
     <div>
-      <LogoutButton setIsLoggedIn={setIsLoggedIn}/>
+      <LogoutButton />
       <h3>Chat with {selectedUser}</h3>
       <ul ref={scrollRef} className="messages">
         {messages.map((message: Message) => {
-          const isFromCurrentUser = message.from === usernameProp;
+          const isFromCurrentUser = message.from === username;
           const messageClass = `message ${isFromCurrentUser ? 'message-left' : 'message-right'}`;
           return (
             <li key={message.id} className={messageClass}>
@@ -134,7 +133,7 @@ const Messages: React.FC<MessagesProps> = ({ usernameProp, setIsLoggedIn }) => {
         <p>Select a user to chat with</p>
       )}
       <p>
-        Connected to socket.io {socketId} as {usernameProp}
+        Connected to socket.io {socketId} as {username}
       </p>
       <Chats
         selectedUser={selectedUser}

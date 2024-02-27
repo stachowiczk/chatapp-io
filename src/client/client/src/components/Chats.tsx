@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import axios from 'axios';
-import { set } from 'mongoose';
 
 const Chats = (props: any) => {
   const [friends, setFriends] = useState<string[]>([]);
   const [addFriend, setAddFriend] = useState<string>('');
   const handleClickedUser = (user: string) => {
+    localStorage.setItem('selectedUser', user);
     props.setSelectedUser(user);
   };
   useEffect(() => {
@@ -28,7 +28,8 @@ const Chats = (props: any) => {
     friendList();
   }, []);
 
-  const handleAddFriend = async () => {
+  const handleAddFriend = async (event: FormEvent) => {
+    event.preventDefault();
     try {
       const response = await axios.post(
         'http://localhost:4000/api/users/add',
@@ -57,12 +58,18 @@ const Chats = (props: any) => {
             console.error(error);
           }
         };
+        await friendList();
       }
     } catch (error) {
       console.error(error);
     }
     setAddFriend('');
   };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setAddFriend(event.target.value);
+  }
 
   return (
     <div>
@@ -89,7 +96,7 @@ const Chats = (props: any) => {
         <input
           type="text"
           placeholder="add friend"
-          onChange={(event) => setAddFriend(event.target.value)}
+          onChange={handleChange}
         />
         <button type="submit">Add</button>
       </form>
