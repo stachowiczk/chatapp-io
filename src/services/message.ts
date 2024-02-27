@@ -2,9 +2,11 @@ import { NOT_FOUND, VALIDATION_ERROR } from '../constants/constants';
 import Message, { MessageInterface } from '../models/message';
 import User from '../models/user';
 import { addFriend, getFriends } from './user';
+
 export const saveMessage = async (data: MessageInterface) => {
   try {
     const { from, to, text } = data;
+    // add the sender to the recipient's contact list
     const user = await User.findOne({ username: to });
     const friends = await getFriends(user);
     if (!friends.includes(from)) {
@@ -35,6 +37,8 @@ export const getMessages = async (sender: string, recipient: string) => {
     })
       .sort({ date: 1 })
       .limit(100);
+
+    // TODO: pagination support
 
     return messages;
   } catch (error) {

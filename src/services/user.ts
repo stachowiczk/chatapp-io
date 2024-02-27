@@ -12,10 +12,12 @@ export const addFriend = async (source: UserInterface, targetUser: string) => {
   if (!targetId) {
     throw new Error(NOT_FOUND);
   }
+
+  // prevent adding self as a friend
   if (source._id.equals(targetId?._id)) {
     throw new Error(CONFLICT);
   }
-  console.log(source._id, targetId?._id);
+  // prevent adding the same friend twice
   const entryAlreadyExists = await User.findOne({
     _id: source._id,
     friends: targetId,
@@ -41,11 +43,12 @@ export const getFriends = async (user: UserInterface) => {
         throw new Error(NOT_FOUND);
     }
     const friends = userDocument?.friends;
+    
     const friendsList = await User.find({
         _id: { $in: friends },
-        }).select('username');
-
-    return friendsList.map((friend) => friend.username);
+        }).select('username'); 
+ 
+    return friendsList.map((friend) => friend.username); // return only the usernames
 }
 
 export const addUser = async (username: string, password: string) => {
@@ -57,6 +60,6 @@ export const addUser = async (username: string, password: string) => {
     user.password = await user.hashPassword(password);
     await user.save();
   } catch (error) {
-    throw new Error(VALIDATION_ERROR);
+    throw new Error(VALIDATION_ERROR); // username already exists
   }
 };

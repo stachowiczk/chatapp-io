@@ -1,3 +1,4 @@
+// config
 export const DB_URI = 'mongodb://localhost:27017';
 export const DB_NAME = 'chat';
 export const SERVER_PORT = 4000;
@@ -8,6 +9,7 @@ export const CORS_OPTIONS = {
   credentials: true,
 };
 
+// error messages
 export const CONFLICT = 'CONFLICT';
 export const NOT_FOUND = 'NOT_FOUND';
 export const VALIDATION_ERROR = 'VALIDATION_ERROR';

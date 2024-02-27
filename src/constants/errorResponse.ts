@@ -1,4 +1,6 @@
 import { CONFLICT, NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED, MISSING_DATA } from './constants';
+
+// error handler for REST API
 export default (err, res) => {
     switch (err.message) {
         case MISSING_DATA:

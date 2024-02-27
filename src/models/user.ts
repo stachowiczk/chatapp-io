@@ -22,12 +22,7 @@ userSchema.methods.validatePassword = async function (password: string) {
 
 userSchema.methods.hashPassword = async function (password: string) {
   return await bcrypt.hash(password, 10);
-}
-
-
-userSchema.methods.getFriends = function () {
-  return this.friends;
-}
+};
 
 const User = mongoose.model<UserInterface>('User', userSchema);
 

@@ -1,4 +1,6 @@
 import { MISSING_DATA, CONFLICT, NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED } from './constants';
+
+// error handler for socket.io
 export default (err, socket) => {
     let errorMessage = 'Internal server error';
     let errorCode = 500;
@@ -24,7 +26,6 @@ export default (err, socket) => {
             errorMessage = 'Unauthorized';
             errorCode = 401;
             break;
-        // default case already set
     }
 
     socket.emit('errorResponse', { errorCode, errorMessage });

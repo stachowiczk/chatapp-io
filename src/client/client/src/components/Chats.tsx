@@ -69,7 +69,7 @@ const Chats = (props: any) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     setAddFriend(event.target.value);
-  }
+  };
 
   return (
     <div>
@@ -93,11 +93,7 @@ const Chats = (props: any) => {
         ))}
       </ul>
       <form onSubmit={handleAddFriend}>
-        <input
-          type="text"
-          placeholder="add friend"
-          onChange={handleChange}
-        />
+        <input type="text" placeholder="add friend" onChange={handleChange} />
         <button type="submit">Add</button>
       </form>
     </div>

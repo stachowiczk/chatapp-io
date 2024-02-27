@@ -11,10 +11,11 @@ const connectedUsers: Record<string, string> = {};
 
 export const initSockets = async (io: Server): Promise<void> => {
   io.on('connection', async (socket: Socket) => {
-    // add client to connected users, remove previous instance of user if exists
+    console.log('a user connected. authenticating...');
+    // get user from JWT
     const cookie = socket.request.headers.cookie;
     const token = cookie?.split('token=')[1];
-
+    
     if (!token) {
       return;
     }
@@ -30,7 +31,8 @@ export const initSockets = async (io: Server): Promise<void> => {
     }
     const usernameFromToken = await User.findOne({ _id: (decoded as any).id });
     const username = usernameFromToken?.username;
-
+    console.log('connected: ', username); 
+    // add client to connected users, remove previous instance of user if exists
     if (username) {
       Object.keys(connectedUsers).find((key) => {
         if (connectedUsers[key] === username) {
@@ -40,7 +42,6 @@ export const initSockets = async (io: Server): Promise<void> => {
       connectedUsers[socket.id] = username;
       //send connected users to all clients
       io.emit('connectedUsers', connectedUsers);
-      console.log('connectedUsers', connectedUsers);
     }
 
     socket.on('selectChat', async (recipient) => {
@@ -67,7 +68,6 @@ export const initSockets = async (io: Server): Promise<void> => {
           throw new Error(NOT_FOUND);
         }
         const fromSocketId = findSocketId(username, connectedUsers);
-        console.log('toSocketId', toSocketId, 'from ', fromSocketId);
 
         if (socket && toSocketId && fromSocketId) {
           socket.to(toSocketId).emit('privateMessage', message);
@@ -80,10 +80,9 @@ export const initSockets = async (io: Server): Promise<void> => {
       }
     });
     socket.on('disconnect', () => {
-      console.log('a user disconnected');
+      console.log('a user disconnected: ', username);
       delete connectedUsers[socket.id];
       io.emit('connectedUsers', connectedUsers);
-      console.log('connectedUsers', connectedUsers);
     });
   });
 };

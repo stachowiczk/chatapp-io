@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 
+// finds socketId by username
 export const findSocketId = (
   username: string,
   users: { [username: string]: string }
@@ -8,6 +9,7 @@ export const findSocketId = (
   return Object.keys(users).find((key) => users[key] === username);
 };
 
+// authentication middleware
 export const authenticate = async (req, res, next) => {
   const token = req.cookies['token'];
   if (!token) {
@@ -30,5 +32,3 @@ export const authenticate = async (req, res, next) => {
     next();
   });
 };
-
-
