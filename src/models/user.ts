@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import Message from './message';
 
 export interface UserInterface extends mongoose.Document {
   username: string;

@@ -31,7 +31,7 @@ import { CORS_OPTIONS, SERVER_PORT } from './constants/constants';
   app.use('/api/auth', loginRouter);
   app.use('/api/users', usersRouter);
 
-  app.use((req, res) => {
+  app.use((_, res) => {
     res.status(404).json({ message: 'Not found' });
   });
 

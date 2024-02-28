@@ -38,7 +38,7 @@
 }
 
 body {
-  background-color: #282c34;
+  background-color: #0b1416;
   color: white;
 }
 
@@ -47,13 +47,34 @@ li {
   list-style: none;
 }
 
-.messages {
+.messages-container {
   display: flex;
+  flex-direction: row-reverse;
+
+  height: 100vh;
+  justify-content: space-between;
+}
+
+.inner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 100vh;
+  width: 100vw;
+
+}
+
+.messages {
+  padding: 0;
+  display: flex;
+  margin-right: 5dvw;
   height: 70dvh;
+  width: 80dvw;
   overflow: scroll;
   scrollbar-width: none;
   flex-direction: column;
-  width: 50dvw;
 }
 
 .message {
@@ -62,8 +83,8 @@ li {
   border-radius: 10px 10px 10px 0px; /* Rounded corners */
   padding: 10px; /* Padding inside the bubble */
   margin-bottom: 10px; /* Spacing between messages */
-  max-width: 80%; /* Maximum width of the message bubble */
   width: fit-content;
+  max-width: 60%;
 }
 
 .message-left {
@@ -71,15 +92,103 @@ li {
   background-color: #e5e5ea;
   color: black;
   border-radius: 10px 10px 0px 10px;
-} 
+}
 
 .message-right {
   align-self: flex-start;
-  background-color: #4d39ff;
+  background-color: #17643e;
   border-radius: 10px 10px 0px 10px;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #121f22;
+  scrollbar-width: none;
+  overflow: hidden;
+  padding: 0; 
+}
+
+ul .chat-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  gap: 1px;
+}
+
+.chat-list li {
+  padding: 10px;
+  width: 90%;
+  margin: 1px 0;
+  border-radius: 10px;
+  background-color: #152529;
+  margin-bottom: 2px;
+  margin-left: 0;
+  margin-right: 0;
+  cursor: pointer;
+}
+
+.chat-list li:hover {
+  background-color: #1f3a3f;
 }
 
 .online-dot {
   color: green;
   font-size: 1.3em;
+}
+
+.offline-dot {
+  color: red;
+  font-size: 1.3em;
+}
+
+.message-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 50%;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+button {
+  border: none;
+  border-radius: 5px;
+  background-color: #152529;
+  color: white;
+  cursor: pointer;
+}
+
+button .message-button {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #1f3a3f;
+}
+
+input {
+  border: none;
+  border-radius: 10px;
+  background-color: #152529;
+  color: white;
+
+}
+
+textarea {
+  border: none;
+  flex-grow: 1;
+  width: 50vw;
+  display: inline-block;
+  border-radius: 10px;
+  background-color: #152529;
+  color: white;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  resize: none;
+  margin: 0 auto;
 }
