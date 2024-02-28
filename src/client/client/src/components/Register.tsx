@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { set } from 'mongoose';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -17,7 +18,8 @@ const Register = () => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
       const response = await axios.post(
         'http://localhost:4000/api/auth/register',
@@ -28,13 +30,13 @@ const Register = () => {
       );
       if (response.status === 200) {
         console.log('registered');
-        return <Navigate to="/login" />;
+        return navigate('/login');
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 409) {
         console.log('username already exists');
       } else if (axios.isAxiosError(error) && error.response?.status === 401) {
-        <Navigate to="/login" />;
+        return navigate('/login');
       }
       console.error(error);
       setUsername('');
@@ -43,8 +45,8 @@ const Register = () => {
   };
 
   return (
-    <div className="register" onSubmit={handleSubmit}>
-      <form>
+    <div className="login" onSubmit={handleSubmit}>
+      <form className='login'>
         <input
           type="text"
           placeholder="username"
@@ -57,6 +59,7 @@ const Register = () => {
         />
         <button type="submit">Register</button>
       </form>
+      <a href="/login" className='register-link'>Login</a>
     </div>
   );
 };

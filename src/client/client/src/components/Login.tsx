@@ -59,8 +59,8 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
+    <div className='login'>
+      <form onSubmit={handleSubmit} className='login'>
         <input
           type="text"
           placeholder="username"
@@ -73,6 +73,7 @@ const Login = () => {
         />
         <button type="submit">Login</button>
       </form>
+      <a href="/register" className='register-link'>Register</a>
     </div>
   );
 };

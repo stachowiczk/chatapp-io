@@ -79,6 +79,7 @@ const Messages = () => {
     }
   }, [messages]);
 
+  // auto resize textarea
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
     event.target.style.height = 'auto';
@@ -114,7 +115,7 @@ const Messages = () => {
     sendPrivateMessage(message);
     setText('');
     const textarea = document.getElementById('textarea-message');
-    if (textarea) textarea.style.height = 'auto';
+    if (textarea) textarea.style.height = 'auto'; // Reset the height to auto
   };
 
   const handleKeyDown = (event: any) => {

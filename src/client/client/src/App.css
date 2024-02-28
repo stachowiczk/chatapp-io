@@ -179,6 +179,21 @@ input {
 
 }
 
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  gap: 10px;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  font-size: 0.8em;
+}
+
 textarea {
   border: none;
   flex-grow: 1;
