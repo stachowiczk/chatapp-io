@@ -10,7 +10,7 @@ A live version is underway
 
 #### Screenshots
 
-![Main window](https://imgur.com/3X76MkJ)
-![Login page](https://imgur.com/f9QmkJ3)
+![Main window](https://imgur.com/3X76MkJ.png)
+![Login page](https://imgur.com/f9QmkJ3.png)
 
 
