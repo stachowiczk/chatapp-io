@@ -8,9 +8,12 @@ Planned features include better handling of contacts, such as the ability to blo
 
 A live version is underway
 
-#### Screenshots
+### Screenshots
+Messages:
 
 ![Main window](https://imgur.com/3X76MkJ.png)
+
+Login page:
 ![Login page](https://imgur.com/f9QmkJ3.png)
 
 
